@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Update the patch level of the base version found in the VERSION file with
+# the number of commits since the last time the VERSION file was modified
+
+VERSION_FILE=${VERSION_FILE:-VERSION}
+
+# Matches 0.1.2 and 0.1.2-descriptive-tag for example
+VERSION_REGEX='([0-9]+[.][0-9]+[.])([0-9]+)([-].*)?'
+
+# If the version file doesn't exist, the version is 0.0.0
+if [[ ! -f ${VERSION_FILE} ]]; then
+    TAG='0.0.0'
+else
+    # Determine the last time VERSION was changed in a commit
+    LAST_COMMIT=$(git log -n 1 --pretty=format:%h -- ${VERSION_FILE})
+
+    # If the VERSION file hasn't been checked in yet, then use the version
+    # inside the VERSION file itself
+    if [[ $LAST_COMMIT = '' ]]; then
+        TAG=$(cat ${VERSION_FILE})
+    else
+        # Count the number of patches
+        PATCH_LEVEL=$(git rev-list "${LAST_COMMIT}.." --count)
+
+        # Create the final version
+        BASE_VERSION=$(<${VERSION_FILE})
+        if [[ $BASE_VERSION =~ $VERSION_REGEX ]]; then
+            #if [[ ${BASH_REMATCH[2]} != 2 ]]; then
+            #echo "WARNING: Patch level in ${VERSION_FILE} file is not 0 and is being replaced" &1>2
+            #fi
+            # lmao what the hell
+            TAG=${BASH_REMATCH[1]}${PATCH_LEVEL}${BASH_REMATCH[3]:-}
+        fi
+    fi
+fi
+
+TAG="v${TAG}"
+
+# If any tracked files have been modified, $GIT_DIRTY will have the value "-dirty"
+GIT_DIRTY=$(test -z "$(git status --porcelain | grep -v '^??')" || printf -- "-dirty")
+GIT_COMMIT=$(git rev-parse --short HEAD)
+
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+GIT_BRANCH_SANITIZED=${GIT_BRANCH,,}
+
+GIT_TAG=$(git name-rev --tags --name-only ${GIT_COMMIT} | sed 's/\^0$//')
+GIT_TAG_SANITIZED=${GIT_TAG,,}
+
+if [ "$GIT_TAG_SANITIZED" != "" ] && [ "$GIT_TAG_SANITIZED" != "undefined" ]; then
+    # This is a tagged version
+    VERSION=$GIT_TAG_SANITIZED
+elif [ "$GIT_BRANCH_SANITIZED" == "main" ]; then
+    # This is on the main branch, so we want to use the generated tag as the version
+    VERSION=$TAG
+else
+    # PRs, manual builds, etc.
+    VERSION=$TAG-$GIT_BRANCH_SANITIZED-$GIT_COMMIT
+fi
+
+# Ensure the version is Docker tag compatible
+# Replace any non-compliant chars with _
+VERSION=${VERSION//[^a-zA-Z0-9_.-]/_}
+echo -n $VERSION$GIT_DIRTY

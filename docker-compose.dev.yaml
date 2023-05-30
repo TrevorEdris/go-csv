@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: ${PWD}
+      dockerfile: ./container/dev.Dockerfile
+    container_name: app
+    environment:
+      - SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock
+    volumes:
+      - ${PWD}/:/app
+      - type: bind
+        source: /run/host-services/ssh-auth.sock
+        target: /run/host-services/ssh-auth.sock
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
