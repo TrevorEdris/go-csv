@@ -1,3 +1,8 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/TrevorEdris/go-csv)](https://goreportcard.com/report/github.com/TrevorEdris/go-csv)
+![CodeQL](https://github.com/TrevorEdris/go-csv/workflows/CodeQL/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GoT](https://img.shields.io/badge/Made%20with-Go-1f425f.svg)](https://go.dev)
+
 # go-csv
 CSV generator written in Go
 
