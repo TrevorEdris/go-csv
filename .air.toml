@@ -2,7 +2,7 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-  bin = "./tmp/main generate --input input/default.yaml"
+  bin = "./tmp/main generate --input input/default.yaml --output output/default.csv"
   cmd = "go build -ldflags \"-X main.Version=in-progress-development\" -o ./tmp/main cmd/gocsv/main.go"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor"]

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/TrevorEdris/go-csv/app"
+	"github.com/TrevorEdris/go-csv/app/config"
 	"github.com/spf13/cobra"
 )
 
@@ -40,7 +42,7 @@ func main() {
 	}
 	generateCmd.Flags().String("logLevel", "INFO", "Log level (DEBUG|INFO|WARN)")
 	generateCmd.Flags().String("input", "input/default.yaml", "Relative filename to the configuration yaml file")
-	generateCmd.Flags().String("output", "output/output.csv", "Filename to write output to")
+	generateCmd.Flags().String("output", "output/default.csv", "Filename to write output to")
 	err := generateCmd.MarkFlagRequired("input")
 	printAndExit(err)
 
@@ -51,7 +53,14 @@ func main() {
 }
 
 func generate(logLevel, inputFilename, outputFilename string) {
-	fmt.Printf("Hello World, from Generate %s!\n", Version)
+	a, err := app.New(&config.Runtime{
+		LogLevel: logLevel,
+		Input:    inputFilename,
+		Output:   outputFilename,
+	})
+	printAndExit(err)
+
+	printAndExit(a.Generate())
 }
 
 func printAndExit(err error) {
