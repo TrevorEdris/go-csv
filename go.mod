@@ -1,6 +1,6 @@
 module github.com/TrevorEdris/go-csv
 
-go 1.20
+go 1.21.4
 
 require (
 	github.com/TrevorEdris/banner v1.1.0
