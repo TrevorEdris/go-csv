@@ -24,3 +24,5 @@ go.work
 # Development
 tmp/
 output/
+logs.txt
+schemas/

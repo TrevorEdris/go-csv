@@ -35,10 +35,4 @@ version: ## Automatically calculate the semantic version based on the number of 
 .PHONY: build
 build:
 	mkdir -p bin
-	go build -ldflags "-s -w ${LDFLAGS} -X main.Version=${VERSION}" -o bin/gocsv cmd/gocsv/main.go
-
-# ----------------------------[ Install ]----------------------------
-
-.PHONY: install
-install:
-	go install -ldflags="-X main.Version=${VERSION}" ./cmd/gocsv
+	go build -ldflags "-s -w ${LDFLAGS} -X main.Version=${VERSION}" -o bin/gocsv main.go
