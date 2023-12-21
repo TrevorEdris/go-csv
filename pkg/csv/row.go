@@ -1,9 +1,12 @@
 package csv
 
-import "github.com/TrevorEdris/go-csv/app/faker"
+import (
+	"github.com/TrevorEdris/go-csv/pkg/faker"
+	"github.com/TrevorEdris/go-csv/pkg/schema"
+)
 
 type (
-	Row struct {
+	row struct {
 		// Values is a map of column labels to column values. This must be a
 		// map to ensure the CSV output matches values to the correct
 		// column.
@@ -11,8 +14,8 @@ type (
 	}
 )
 
-func NewRow(headers []Column) Row {
-	record := Row{
+func newRow(headers schema.Headers) row {
+	record := row{
 		Values: make(map[string]string),
 	}
 	for _, header := range headers {
@@ -21,7 +24,7 @@ func NewRow(headers []Column) Row {
 	return record
 }
 
-func (r *Row) generateValues(col Column) string {
+func (r *row) generateValues(col schema.Column) string {
 	v := faker.FakeValue(faker.Source(col.Source), col.StringConstraint, col.NumericConstraint, col.TimestampConstraint, col.GeneralConstraint)
 
 	r.Values[col.Label] = v
@@ -29,10 +32,14 @@ func (r *Row) generateValues(col Column) string {
 	return v
 }
 
-func (r *Row) ToStringSlice(headers []Column) []string {
+func (r *row) ToStringSlice(headers schema.Headers) []string {
 	output := make([]string, len(headers))
 	for i, header := range headers {
-		output[i] = r.Values[header.Label]
+		if header.Order != nil {
+			output[*header.Order] = r.Values[header.Label]
+		} else {
+			output[i] = r.Values[header.Label]
+		}
 	}
 	return output
 }

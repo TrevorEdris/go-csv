@@ -3,7 +3,8 @@ package csv
 import (
 	"fmt"
 
-	"github.com/TrevorEdris/go-csv/app/faker"
+	"github.com/TrevorEdris/go-csv/pkg/faker"
+	"github.com/TrevorEdris/go-csv/pkg/schema"
 )
 
 type (
@@ -11,10 +12,10 @@ type (
 
 	Column struct {
 		// These are pointers because not every column will define a value for them
-		NumericConstraint   *faker.NumericConstraint   `yaml:"numericConstraint"`
-		StringConstraint    *faker.StringConstraint    `yaml:"stringConstraint"`
-		TimestampConstraint *faker.TimestampConstraint `yaml:"timestampConstraint"`
-		GeneralConstraint   *faker.GeneralConstraint   `yaml:"generalConstraint"`
+		NumericConstraint   *schema.NumericConstraint   `yaml:"numericConstraint"`
+		StringConstraint    *schema.StringConstraint    `yaml:"stringConstraint"`
+		TimestampConstraint *schema.TimestampConstraint `yaml:"timestampConstraint"`
+		GeneralConstraint   *schema.GeneralConstraint   `yaml:"generalConstraint"`
 
 		Order *int `yaml:"order"`
 
@@ -46,36 +47,6 @@ func (h Headers) Validate() error {
 		}
 	}
 	return nil
-}
-
-func (h Headers) Sort() Headers {
-	newH := make(Headers, len(h))
-
-	withOrder, withoutOrder := separateColumnsByOrder(h)
-	for _, c := range withOrder {
-		newH[*c.Order] = c
-	}
-
-	withoutOrderIndex := 0
-	emptyCol := Column{}
-	for newHIndex := 0; newHIndex < len(newH); newHIndex++ {
-		if newH[newHIndex] == emptyCol {
-			newH[newHIndex] = withoutOrder[withoutOrderIndex]
-			withoutOrderIndex++
-		}
-	}
-	return newH
-}
-
-func separateColumnsByOrder(h Headers) (withOrder, withoutOrder Headers) {
-	for _, col := range h {
-		if col.Order != nil {
-			withOrder = append(withOrder, col)
-		} else {
-			withoutOrder = append(withoutOrder, col)
-		}
-	}
-	return withOrder, withoutOrder
 }
 
 func (c *Column) Validate() error {
