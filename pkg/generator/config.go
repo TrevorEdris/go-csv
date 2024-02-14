@@ -43,7 +43,7 @@ type (
 	}
 
 	StringConstraint struct {
-		OneOf   []string
+		OneOf   []string `yaml:"oneOf"`
 		Pattern *string
 	}
 
@@ -103,7 +103,7 @@ func (f Field) valueFromConstraint() string {
 		} else if f.StringConstraint.Pattern != nil {
 			return gofakeit.Regex(*f.StringConstraint.Pattern)
 		} else {
-			return "INVALID_STRING_CONSTRAINT"
+			return "INVALID_STRING_CONSTRAINT" // TODO: Shouldn't happen after `Config.Validate`
 		}
 	}
 
