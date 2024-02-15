@@ -6,19 +6,20 @@ fields:
 - name: STREET
   type: street
 - name: DOB
-  type: "Just here so I dont get fired"
   timeConstraint:
     min: 1945-01-01
     max: 2005-02-12
     format: 2006-01-02
 - name: PICK_ONE
-  type: "Also doesnt matter"
   stringConstraint:
     oneOf:
     - R
     - B
     - Y
 - name: PATTERNITIZED
-  type: "asdf"
   stringConstraint:
     pattern: '^[a-zA-Z0-9_]{6}$'
+- name: SOME_NUM
+  numConstraint:
+    min: 420
+    max: 1337
