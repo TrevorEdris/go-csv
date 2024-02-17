@@ -23,8 +23,8 @@ var (
 
 type (
 	Config struct {
-		Fields    []Field `validate:"required,dive,required"`
-		Delimiter *string `json:"delimiter,omitempty"`
+		Fields    []*Field `validate:"required,dive,required"`
+		Delimiter *string  `json:"delimiter,omitempty"`
 	}
 
 	Field struct {
@@ -112,15 +112,15 @@ func (c Config) AsFormattedJson() (string, error) {
 	return string(b), nil
 }
 
-func (f Field) registerParams(p FieldParams) {
+func (f *Field) registerParams(p FieldParams) {
 	f.params = p
 }
 
-func (f Field) hasValueConstraints() bool {
+func (f *Field) hasValueConstraints() bool {
 	return (f.NumConstraint != nil) || (f.StringConstraint != nil) || (f.TimeConstraint != nil)
 }
 
-func (f Field) hasMultipleValueConstraints() bool {
+func (f *Field) hasMultipleValueConstraints() bool {
 	c := 0
 	if f.NumConstraint != nil {
 		c++

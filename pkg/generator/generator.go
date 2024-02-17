@@ -93,7 +93,7 @@ func (g *Generator) RegisterNewValueFunction(key string, f RandomValueFunc) erro
 		return ErrKeyConflict
 	}
 	g.fakers[key] = f
-	g.log.Info("Successfully registered value function", zap.String("key", key))
+	g.log.Debug("Successfully registered value function", zap.String("key", key))
 	return nil
 }
 
@@ -132,10 +132,12 @@ func (g *Generator) Generate(count int) error {
 		pb.Add(1)
 	}
 
+	g.log.Info("CSV generation complete", zap.String("filename", g.output))
+
 	return nil
 }
 
-func (g *Generator) randomValue(field Field) string {
+func (g *Generator) randomValue(field *Field) string {
 	// Return empty string if field was randomly selected to be omitted
 	if g.shouldOmit(field) {
 		return ""
@@ -162,9 +164,9 @@ func (g *Generator) wrap(s string) string {
 	return s
 }
 
-func (g *Generator) shouldOmit(f Field) bool {
+func (g *Generator) shouldOmit(f *Field) bool {
 	if f.GenericConstraint != nil {
-		return g.r.Float64() > *f.GenericConstraint.ChanceToOmit
+		return g.r.Float64() < *f.GenericConstraint.ChanceToOmit
 	}
 	return false
 }
