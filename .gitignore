@@ -24,3 +24,6 @@ go.work
 # Development
 tmp/
 output/
+.tmp/
+.vscode/
+out.csv
