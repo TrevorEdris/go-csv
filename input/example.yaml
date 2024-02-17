@@ -1,23 +1,30 @@
+# delimiter: "," # The default delimiter is "," but a custom delimiter can be specified
+# fields describes the columns that will be added to the CSV file
 fields:
-- name: FNAME
-  type: firstName
+- name: FNAME # required
+  type: firstName # Either type or xxxConstraint is required
 - name: LNAME
   type: lastName
 - name: STREET
   type: street
 - name: DOB
+  # Each field may specify either a `type` or a `xxxConstraint` but not both.
+  # Specifying `type` will correspond to a predefined function for generating
+  # a random value.
+  # Specifying `xxxConstraint` will generate a random value based on the provided
+  # configuration, unique to each constraint.
   timeConstraint:
     min: 1945-01-01
     max: 2005-02-12
-    format: 2006-01-02
+    format: 2006-01-02 # required, Must use the reference time, see https://www.geeksforgeeks.org/time-formatting-in-golang/
 - name: PICK_ONE
-  stringConstraint:
+  stringConstraint: # Evenly weighted selection of the provided oneOf values
     oneOf:
     - R
     - B
     - Y
 - name: PATTERNITIZED
-  stringConstraint:
+  stringConstraint: # Randomly generated string matching the provided regex
     pattern: '^[a-zA-Z0-9_]{6}$'
 - name: SOME_NUM
   numConstraint:

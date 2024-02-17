@@ -8,162 +8,167 @@ CSV generator written in Go
 
 ## Dependencies
 
-- [Go 1.20](https://github.com/moovweb/gvm)
+- [Go 1.21.4](https://github.com/moovweb/gvm)
 
 ## Quick Usage
 
 ```
-❯ go run cmd/gocsv/main.go generate  --input input/default.yaml --output output.csv
-2023-05-30T10:18:23.846-0400 INFO Generating CSV
-2023-05-30T10:18:23.847-0400 INFO Completed in 200.4µs
+❯ go run main.go
+ 100% |█████████████████████████████████████████████████████████████████████| (5/5, 29732 it/s)
+2024-02-17T10:27:52.525-0500    INFO    generator/generator.go:135      CSV generation complete {"filena
+me": "out.csv"}
 
-❯ cat output.csv
-Group,First Name,Last Name,Country of Origin,Birthday,Some Text
-6,Karen,Labadie,United Kingdom of Great Britain and Northern Ireland,2018-01-30,9Ewxfa
-7,Blaise,Greenfelder,Benin,1954-08-06,lllD3t
-7,Wilburn,Osinski,Haiti,1920-07-29,Tvhz_l
-4,Nicolas,Gerhold,"Moldova, Republic of",1922-07-29,FkwWCT
-5,Oleta,Feil,Bahrain,1972-10-26,qAOdct
+❯ cat out.csv
+FNAME,LNAME,STREET,DOB,PICK_ONE,PATTERNITIZED,SOME_NUM
+Roberta,Bartoletti,345 Creekmouth,1959-11-15,R,r0CUhz,1104
+Zola,Nader,510 Capeport,1976-12-25,Y,_B_kQ4,558
+Dasia,Kerluke,4154 West Landington,1969-04-01,R,2VBt23,914
+Lydia,Bednar,5453 Heightsville,1967-05-18,B,ZkqQsO,551
+Alta,Rau,276 New Causewayville,2003-07-29,B,hwMgWW,1145
 ```
 
-**Generate command help**
+**Command help**
 
 ```
-❯ go run cmd/gocsv/main.go generate
-Error: required flag(s) "input" not set
-Usage:
-  gocsv generate [flags]
-
-Flags:
-  -h, --help              help for generate
-      --input string      Relative filename to the configuration yaml file (default "input/default.yaml")
-      --logLevel string   Log level (DEBUG|INFO|WARN) (default "INFO")
-      --output string     Filename to write output to (default "output/default.csv")
-
-required flag(s) "input" not set
-exit status 1
-```
-
-## Installation
-
-Use the provided `Makefile` to assist with installation.
-
-```
-❯ make install
-go install ./cmd/gocsv
-```
-
-The `gocsv` command should now be accessible via CLI.
-
-```
-❯ gocsv -h
-Interact with CSV files
-
-Usage:
-  gocsv [command]
-
-Available Commands:
-  completion  Generate the autocompletion script for the specified shell
-  generate    Generate CSV file with randomized data
-  help        Help about any command
-  version     Print the version of gocsv
-
-Flags:
-  -h, --help   help for gocsv
-
-Use "gocsv [command] --help" for more information about a command.
+❯ go run main.go -h
+Usage of /var/folders/0t/w8j6n37s48g0b7kypjpbjp4w0000gn/T/go-build2512557781/b001/exe/main:
+  -count int
+        Number of records to generate (default 5)
+  -help
+        Show usage
+  -input string
+        Input filename (default "input/example.yaml")
+  -output string
+        Output filename (default "out.csv")
 ```
 
 ## Configuration
 
-See [CONFIGURATION.md](./CONFIGURATION.md) for the configuration file schema.
+See [input/example.yaml](./input/example.yaml) for an example configuration file with annotations.
 
-## Development
+### Available Constraints
 
-### Requirements
+**Generic Constraint**
 
-- Docker
-- Docker Compose
+A constraint that can be applied to any field and can be combined with both `type` and `xxxConstraint`.
 
-The provided `Makefile` has multiple targets to assist with development.
-
-```
-❯ make help
-help     List of available commands
-up       Run the application and follow the logs
-down     Stop all containers
-restart  Restart all containers
-logs     Print logs in stdout
-version  Automatically calculate the semantic version based on the number of commits since the last change to the VERSION file
+```yaml
+genericConstraint:
+  chanceToOmit: 0.1 # 10% chance of an empty string
 ```
 
-The typical workflow would be:
+`chanceToOmit` must be a decimal between 0 and 1. When a randomly generated decimal is **less than** the configured `chanceToOmit`, the value for that cell will be an empty string.
 
-1. `make up`
-2. _Make code changes in your editor of choice_
-3. _The changes are automatically detected and a rebuild / rerun is initiated_
-4. `Ctrl+C` to quit
-5. `make restart` to restart the development environment
+**Num Constraint**
 
-**Example**
-
-```
-❯ make up
-docker-compose -f docker-compose.dev.yaml up -d
-Creating network "go-csv_default" with the default driver
-Creating app ... done
-make -s logs
-Attaching to app
-app    |
-app    |   __    _   ___
-app    |  / /\  | | | |_)
-app    | /_/--\ |_| |_| \_ , built with Go
-app    |
-app    | watching .
-app    | watching app
-app    | watching app/config
-app    | watching app/csv
-app    | watching app/faker
-app    | watching app/log
-app    | watching cmd
-app    | watching cmd/gocsv
-app    | watching container
-app    | watching input
-app    | watching output
-app    | !exclude tmp
-app    | building...
-app    | go: downloading github.com/spf13/cobra v1.7.0
-app    | go: downloading gopkg.in/yaml.v3 v3.0.1
-app    | go: downloading github.com/TrevorEdris/banner v1.1.0
-app    | go: downloading go.uber.org/zap v1.24.0
-app    | go: downloading github.com/brianvoe/gofakeit/v6 v6.21.0
-app    | go: downloading github.com/spf13/pflag v1.0.5
-app    | go: downloading go.uber.org/multierr v1.6.0
-app    | go: downloading go.uber.org/atomic v1.7.0
-app    | running...
-app    | 2023-05-30T14:24:02.534Z INFO Generating CSV
-app    | 2023-05-30T14:24:02.534Z INFO Completed in 222.5µs
-app    | app/csv/row.go has changed
-app    | building...
-app    | running...
-app    | 2023-05-30T14:24:12.204Z INFO Generating CSV
-app    | 2023-05-30T14:24:12.204Z INFO Completed in 224.8µs
+```yaml
+numConstraint:
+  min: 420
+  max: 1337
 ```
 
-In this example, the command specified in [.air.toml](./.air.toml) was automatically ran. Code changes
-were made to `app/csv/row.go` and the binary was rebuilt and reran with the same command.
+Generate an integer between the specified `min` and `max` values (both required).
 
-This functionality is provided by [cosmtrek/air](github.com/cosmtrek/air) and the configuration can be
-found in [.air.toml](./.air.toml).
+**Time Constraint**
 
-The command that is run is controlled by this section of the file:
-
-```toml
-[build]
-  bin = "./tmp/main generate --input input/default.yaml --output output/default.csv"
+```yaml
+timeConstraint:
+  format: 2006-01-02
+  min: 1945-01-01
+  max: 2005-02-12
 ```
 
-**Note:** When `.air.toml` is modified, the development environment must be restarted to pick up the change.
+Generate a timestamp with the specified `format` between the specified `min` and `max` times.
+
+Note: The time value used in the `format` field must match the Golang reference time `Mon, 02 Jan 2006 15:04:05 MST`, see https://www.geeksforgeeks.org/time-formatting-in-golang/.
+
+**String Constraint**
+
+```yaml
+stringConstraint:
+  pattern: '^[a-zA-Z0-9_]{6}$'
+  oneOf:
+    - R
+    - B
+    - Y
+```
+
+Must specify either `pattern`, a regex pattern, or `oneOf`, a list of possible values, but cannot specify both. When using `oneOf`, a random entry in the list will be chosen as the value. All entries have equal weight. For differently weighted entries, either register a custom value function or provide multiple entries in `oneOf` corresponding to the desired weights.
+
+```yaml
+stringConstraint:
+  oneOf:
+    - A
+    - A
+    - A
+    - B
+```
+
+The above configuration will choose `A` 75% of the time and `B` 25% of the time.
+
+### Available Types
+
+- `EMPTY`
+- `UINT64`
+- `UINT32`
+- `UINT8`
+- `FIRSTNAME`
+- `LASTNAME`
+- `STREET`
+- `CITY`
+- `STATE`
+- `ZIP`
+- `PHONE`
+- `EMAIL`
+- `COMPANY`
+- `YES_OR_NO`
+- `CONSISTENTLY_INCREASING_ID`
+
+## Registering a custom value function
+
+A custom function can be registered to a generator, exposing that function for use via the configuration yaml file. The function must match the `generator.RandomValueFunc` signature
+
+```go
+type RandomValueFunc func(p FieldParams) string
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/TrevorEdris/go-csv/pkg/generator"
+)
+
+func main() {
+	g, err := generator.NewGenerator("input/example.yaml", "out.csv")
+	if err != nil {
+		log.Fatalf("Failed to initialize generator: %s", err.Error())
+	}
+
+	err = g.RegisterNewValueFunction("ROW_NUMBER", myOwnValueFunction)
+	if err != nil {
+		log.Fatalf("Failed to register value function: %s", err.Error())
+	}
+
+	err = g.Generate(*count)
+	if err != nil {
+		log.Fatalf("Failed to generate CSV: %s", err.Error())
+	}
+}
+
+func myOwnValueFunction(p generator.FieldParams) string {
+	return fmt.Sprintf("ROW_NUMBER-%d", p.RowNumber)
+}
+```
+
+```yaml
+fields:
+- name: RowNum
+  type: ROW_NUMBER # The value passed in to `g.RegisterNewValueFunction`
+```
 
 ## Contributing
 
